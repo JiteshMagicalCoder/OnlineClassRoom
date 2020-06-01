@@ -1,0 +1,84 @@
+<%-- 
+    Document   : insertimage
+    Created on : Feb 25, 2016, 9:49:56 PM
+    Author     : user
+--%>
+
+    <%@page import="java.io.InputStream"%>
+    <%@page import="java.io.FileInputStream"%>
+    <%@page import="java.io.File"%>
+    <%@page import="java.sql.DriverManager"%>
+    <%@page import="java.sql.ResultSet"%>
+    <%@page import="java.sql.PreparedStatement"%>
+    <%@page import="java.sql.Connection"%>
+    <%@page contentType="text/html" pageEncoding="UTF-8"%>
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <title>Insert an Image into MySQL Database</title>
+        </head>
+    
+        <body>
+        <marquee>
+         <font color="blue">Please create a folder image in c drive and save your image inside the image folder in c drive before uploading.
+         </font>
+        </marquee>
+        <h1><font color="red">Insert an Image into MySQL Database</font></h1>
+        <a href="display.jsp"> click here</a>
+        <a href="display1.jsp"> click here</a>
+
+            <%
+                String fname =request.getParameter("firstName");
+                String image1 =request.getParameter("photo");
+                String lname=image1;
+                Connection conn = null;
+                PreparedStatement pstmt = null;
+                ResultSet rs = null;
+                String url = "jdbc:mysql://localhost:3306/imageupload";//Here the "test" is the Database name
+                FileInputStream fis = null;
+     
+                try {
+                    Class.forName("com.mysql.jdbc.Driver").newInstance();
+                    conn = DriverManager.getConnection(url, "root", "root");
+                    String path="H:/image/"+image1;
+                    File image = new File(path);
+                    pstmt = conn.prepareStatement("insert into image(firstname, lastname, image, email) values(?,?,?,?)");
+                    pstmt.setString(1,fname);
+                    pstmt.setString(2,lname);
+                    pstmt.setString(4, "email");
+                    fis = new FileInputStream(image);
+                    pstmt.setBinaryStream(3, (InputStream) fis, (int) (image.length()));
+                    int count = pstmt.executeUpdate();
+                    if (count> 0) 
+                    {
+                        out.println("The image has been inserted successfully");
+                    } else {
+                        out.println("The image did not insert successfully");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        if (rs != null) {
+                            rs.close();
+                            rs = null;
+                        }
+                        if (pstmt != null) {
+                            pstmt.close();
+                            pstmt = null;
+                        }
+                        if (conn != null) {
+                            conn.close();
+                            conn = null;
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+     
+            %>
+        </body>
+    </html>
+
+    
